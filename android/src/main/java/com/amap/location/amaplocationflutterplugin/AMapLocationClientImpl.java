@@ -102,14 +102,37 @@ public class AMapLocationClientImpl implements AMapLocationListener {
         }
 
         if (optionMap.containsKey("locationMode")) {
-            try {
-                locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.values()[(int) optionMap.get("locationMode")]);
-            } catch (Throwable e) {
+            // 与 lib/amap_location_option.dart 中 AMapLocationMode 的声明顺序一一对应，
+            // 不能直接使用 values()[index]：SDK 自身的枚举声明顺序与之不同。
+            switch ((int) optionMap.get("locationMode")) {
+                case 1:
+                    locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Device_Sensors);
+                    break;
+                case 2:
+                    locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+                    break;
+                case 0:
+                default:
+                    locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
+                    break;
             }
         }
 
         if (optionMap.containsKey("geoLanguage")) {
-            locationOption.setGeoLanguage(AMapLocationClientOption.GeoLanguage.values()[(int) optionMap.get("geoLanguage")]);
+            // 与 lib/amap_location_option.dart 中 GeoLanguage 的声明顺序一一对应，
+            // 不能直接使用 values()[index]：SDK 自身的枚举声明顺序与之不同。
+            switch ((int) optionMap.get("geoLanguage")) {
+                case 1:
+                    locationOption.setGeoLanguage(AMapLocationClientOption.GeoLanguage.ZH);
+                    break;
+                case 2:
+                    locationOption.setGeoLanguage(AMapLocationClientOption.GeoLanguage.EN);
+                    break;
+                case 0:
+                default:
+                    locationOption.setGeoLanguage(AMapLocationClientOption.GeoLanguage.DEFAULT);
+                    break;
+            }
         }
 
         if (optionMap.containsKey("onceLocation")) {

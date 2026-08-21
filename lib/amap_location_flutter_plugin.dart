@@ -14,21 +14,22 @@ class AmapLocationFlutterPlugin {
   static const EventChannel _eventChannel =
       const EventChannel(_CHANNEL_STREAM_LOCATION);
 
-  static Stream<Map<String, Object>> _onLocationChanged = _eventChannel
+  static final Stream<Map<String, Object?>> _onLocationChanged = _eventChannel
       .receiveBroadcastStream()
       .asBroadcastStream()
-      .map<Map<String, Object>>((element) => element.cast<String, Object>());
+      .map<Map<String, Object?>>((element) => Map<String, Object?>.from(element));
 
-  StreamController<Map<String, Object>> _receiveStream;
-  StreamSubscription<Map<String, Object>> _subscription;
-  String _pluginKey;
+  StreamController<Map<String, Object?>>? _receiveStream;
+  StreamSubscription<Map<String, Object?>>? _subscription;
+  final String _pluginKey = DateTime.now().millisecondsSinceEpoch.toString();
 
   /// 适配iOS 14定位新特性，只在iOS平台有效
   Future<AMapAccuracyAuthorization> getSystemAccuracyAuthorization() async {
     int result = -1;
     if (Platform.isIOS) {
-      result = await _methodChannel.invokeMethod(
-          "getSystemAccuracyAuthorization", {'pluginKey': _pluginKey});
+      result = await _methodChannel.invokeMethod<int>(
+              "getSystemAccuracyAuthorization", {'pluginKey': _pluginKey}) ??
+          -1;
     }
     if (result == 0) {
       return AMapAccuracyAuthorization.AMapAccuracyAuthorizationFullAccuracy;
@@ -36,11 +37,6 @@ class AmapLocationFlutterPlugin {
       return AMapAccuracyAuthorization.AMapAccuracyAuthorizationReducedAccuracy;
     }
     return AMapAccuracyAuthorization.AMapAccuracyAuthorizationInvalid;
-  }
-
-  ///初始化
-  AmapLocationFlutterPlugin() {
-    _pluginKey = DateTime.now().millisecondsSinceEpoch.toString();
   }
 
   ///开始定位
@@ -76,26 +72,26 @@ class AmapLocationFlutterPlugin {
   ///销毁定位
   void destroy() {
     _methodChannel.invokeListMethod('destroy', {'pluginKey': _pluginKey});
-    if (_subscription != null) {
-      _receiveStream.close();
-      _subscription.cancel();
-      _receiveStream = null;
-      _subscription = null;
-    }
+    _subscription?.cancel();
+    _receiveStream?.close();
+    _receiveStream = null;
+    _subscription = null;
   }
 
   ///定位结果回调
-  Stream<Map<String, Object>> onLocationChanged() {
-    if (_receiveStream == null) {
-      _receiveStream = StreamController();
-      _subscription = _onLocationChanged.listen((Map<String, Object> event) {
-        if (event != null && event['pluginKey'] == _pluginKey) {
-          Map<String, Object> newEvent = Map<String, Object>.of(event);
+  Stream<Map<String, Object?>> onLocationChanged() {
+    StreamController<Map<String, Object?>>? receiveStream = _receiveStream;
+    if (receiveStream == null) {
+      receiveStream = StreamController<Map<String, Object?>>();
+      _receiveStream = receiveStream;
+      _subscription = _onLocationChanged.listen((Map<String, Object?> event) {
+        if (event['pluginKey'] == _pluginKey) {
+          Map<String, Object?> newEvent = Map<String, Object?>.of(event);
           newEvent.remove('pluginKey');
-          _receiveStream.add(newEvent);
+          receiveStream!.add(newEvent);
         }
       });
     }
-    return _receiveStream.stream;
+    return receiveStream.stream;
   }
 }

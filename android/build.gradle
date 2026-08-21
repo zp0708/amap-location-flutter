@@ -4,36 +4,41 @@ version '1.0-SNAPSHOT'
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.1'
+        classpath 'com.android.tools.build:gradle:8.9.1'
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    namespace 'com.amap.location.amaplocationflutterplugin'
+
+    compileSdk 36
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
 
     defaultConfig {
-        minSdkVersion 16
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        minSdk 19
     }
     lintOptions {
         disable 'InvalidPackage'
     }
 
     dependencies {
-        implementation fileTree(dir: 'libs', include: ['*.jar'])
-//        compile 'com.amap.api:location:4.9.0'
+        implementation 'com.amap.api:location:11.2.100'
     }
 }

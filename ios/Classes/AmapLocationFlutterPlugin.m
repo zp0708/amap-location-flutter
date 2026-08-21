@@ -32,6 +32,10 @@
 @implementation AmapLocationFlutterPlugin
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+    // 隐私合规：必须在AMapLocationManager实例化之前调用
+    [AMapLocationManager updatePrivacyShow:AMapPrivacyShowStatusDidShow privacyInfo:AMapPrivacyInfoStatusDidContain];
+    [AMapLocationManager updatePrivacyAgree:AMapPrivacyAgreeStatusDidAgree];
+
     FlutterMethodChannel* channel = [FlutterMethodChannel
                                      methodChannelWithName:@"amap_location_flutter_plugin"
                                      binaryMessenger:[registrar messenger]];

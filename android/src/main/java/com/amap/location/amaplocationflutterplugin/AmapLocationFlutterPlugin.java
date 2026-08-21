@@ -138,6 +138,12 @@ public class AmapLocationFlutterPlugin implements MethodCallHandler,
             mContext = binding.getApplicationContext();
 
             /**
+             * 隐私合规：必须在AMapLocationClient实例化之前调用
+             */
+            AMapLocationClient.updatePrivacyShow(mContext, true, true);
+            AMapLocationClient.updatePrivacyAgree(mContext, true);
+
+            /**
              * 方法调用通道
              */
             final MethodChannel channel = new MethodChannel(binding.getBinaryMessenger(), CHANNEL_METHOD_LOCATION);

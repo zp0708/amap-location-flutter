@@ -17,7 +17,10 @@ AMapLocation flutter plugin
   s.dependency 'Flutter'
 
   s.static_framework = true
-  s.ios.deployment_target = '8.0'
-  s.dependency 'AMapLocation','~>2.6.7'
+  s.ios.deployment_target = '12.0'
+  s.dependency 'AMapLocation','~>2.12.2'
+
+  # Flutter.framework does not contain a i386 slice.
+  s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }
 end
 
